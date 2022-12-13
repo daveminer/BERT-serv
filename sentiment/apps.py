@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class FinbertConfig(AppConfig):
+class SentimentConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'finbert'
+    name = 'sentiment'
