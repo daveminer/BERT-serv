@@ -1,5 +1,5 @@
 import numpy as np
-from django.shortcuts import render
+# from django.shortcuts import render
 from transformers import BertTokenizer, BertForSequenceClassification
 
 # Create your views here.
