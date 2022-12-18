@@ -1,5 +1,5 @@
 from celery import Celery
-from .sentiment import Sentiment
+from .models import Sentiment
 
 app = Celery('celery',
              broker='amqp://guest:guest@localhost:5672',
