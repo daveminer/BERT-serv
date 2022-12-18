@@ -1,3 +1,5 @@
+coverage-html:
+	pytest --cov=. --cov-report=html
 deps:
 	pip install -r requirements.txt
 dev:
