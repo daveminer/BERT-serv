@@ -23,3 +23,6 @@ class Sentiment:
             label = self.labels[np.argmax(outputs.detach().numpy()[idx])]
             print(sent, '----', label)
             result.push((sent, label))
+
+    def coverage_test():
+        print("COVTEST")
