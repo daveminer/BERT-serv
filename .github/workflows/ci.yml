@@ -16,7 +16,7 @@ jobs:
         id: cache-venv
         uses: actions/cache@v3.0.11
         with:
-          path: venv
+          path: .venv
           key: >-
             ${{ runner.os }}-${{ steps.python.outputs.python-version }}-venv-${{
               needs.info.outputs.pre-commit_cache_key }}
