@@ -25,6 +25,6 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test and Cover with pytest
         run: |
-          coverage run -m pytest
+          pytest --cov .
       - name: Codecov
         uses: codecov/codecov-action@v3.1.1

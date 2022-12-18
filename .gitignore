@@ -1,4 +1,5 @@
 *.pyc
-.pytest_cache
 db.sqlite3
+.coverage
+.pytest_cache
 .venv
