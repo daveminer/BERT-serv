@@ -1,0 +1,7 @@
+{% block content %}
+<h1>Sentiments</h1>
+{% if sentiment_list %} {% for record in sentiment_list %}
+<p>{{ record.created }} / {{ record.sentiment }} / {{record.text}}</p>
+{% endfor %} {% else %}
+<p>There are no sentiments to show.</p>
+{% endif %} {% endblock %}
