@@ -12,5 +12,3 @@ test-ci:
 	act
 test-ci-coverage:
 	act workflow_run --workflows ./.github/workflows/coverage.yml
-venv:
-	source .venv/bin/activate
