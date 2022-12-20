@@ -2,6 +2,8 @@ from django.db import models
 from transformers import BertTokenizer, BertForSequenceClassification
 import numpy as np
 
+from celery.contrib import rdb
+
 
 class Sentiment(models.Model):
     text = models.TextField(null=False)

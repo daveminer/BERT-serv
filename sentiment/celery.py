@@ -1,19 +1,19 @@
+import os
 from celery import Celery
-from .models import Sentiment
+# from celery.contrib import rdb
+# from .models import Sentiment
 
-app = Celery('celery',
+
+app = Celery('sentiment',
              broker='amqp://guest:guest@localhost:5672',
-             backend='rpc://')
+             include=['sentiment.tasks'])
 
 
-@app.task
-def run_sentiment(sentences):
-    Sentiment.run(sentences)
+os.environ['DJANGO_SETTINGS_MODULE'] = "bert_serv.settings"
 
-    # Optional configuration, see the application user guide.
-    # app.conf.update(
-    #     result_expires=3600,
-    # )
+app.conf.update(
+    result_expires=3600,
+)
 
-    # if __name__ == '__main__':
-    #     app.start()
+if __name__ == '__main__':
+    app.start()
