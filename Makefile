@@ -1,11 +1,11 @@
 coverage-html:
 	pytest --cov=. --cov-report=html
 deps:
-	pip install -r requirements.txt
+	pip3 install -r requirements.txt
 dev:
 	./manage.py runserver
 freeze:
-	pip freeze > requirements.txt
+	pip3 freeze > requirements-freeze.txt
 test:
 	./manage.py test
 test-ci:
