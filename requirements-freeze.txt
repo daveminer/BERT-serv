@@ -28,6 +28,7 @@ click-repl==0.2.0
 colorama==0.4.4
 command-not-found==0.3
 constantly==15.1.0
+coverage==7.0.0
 cryptography==38.0.4
 cssselect==1.2.0
 cupshelpers==1.0

@@ -11,7 +11,7 @@ freeze:
 services:
 	docker-compose up --detach celery-worker rabbitmq redis
 test:
-	./manage.py test
+	coverage run -m pytest
 test-ci:
 	act
 test-ci-coverage:
