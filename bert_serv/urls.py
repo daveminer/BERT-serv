@@ -16,7 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from sentiment.views.createview import SentimentCreate
+from sentiment.views.listview import SentimentList
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('sentiment/', include('sentiment.urls')),
+    path('sentiment/', SentimentList.as_view()),
+    path('sentiment/new', SentimentCreate.as_view())
 ]
