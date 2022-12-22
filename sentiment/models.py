@@ -2,8 +2,6 @@ from django.db import models
 from transformers import BertTokenizer, BertForSequenceClassification
 import numpy as np
 
-from celery.contrib import rdb
-
 
 class Sentiment(models.Model):
     text = models.TextField(null=False)
@@ -22,8 +20,10 @@ class Sentiment(models.Model):
     def run(sentences):
         inputs = Sentiment.tokenizer(
             sentences, return_tensors="pt", padding=True)
+
         outputs = Sentiment.finbert(**inputs)[0]
 
         for idx, sent in enumerate(sentences):
-            label = Sentiment.labels[np.argmax(outputs.detach().numpy()[idx])]
+            label = Sentiment.labels[np.argmax(
+                outputs.detach().numpy()[idx])]
             Sentiment.objects.create(text=sent, sentiment=label)

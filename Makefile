@@ -1,14 +1,20 @@
+app:
+	./manage.py runserver
 coverage-html:
 	pytest --cov=. --cov-report=html
 deps:
-	pip install -r requirements.txt
+	pip3 install -r requirements.txt
 dev:
-	./manage.py runserver
+	docker-compose up --detach
 freeze:
-	pip freeze > requirements.txt
+	pip3 freeze > requirements-freeze.txt
+services:
+	docker-compose up --detach celery-worker rabbitmq redis
 test:
-	./manage.py test
+	coverage run -m pytest
 test-ci:
 	act
 test-ci-coverage:
 	act workflow_run --workflows ./.github/workflows/coverage.yml
+worker:
+	celery -A sentiment worker --pool=solo --loglevel=INFO
