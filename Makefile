@@ -9,7 +9,7 @@ dev:
 freeze:
 	pip3 freeze > requirements-freeze.txt
 services:
-	docker-compose up --detach celery-worker rabbitmq redis
+	docker-compose up --detach celery_worker rabbitmq redis
 test:
 	coverage run -m pytest
 test-ci:

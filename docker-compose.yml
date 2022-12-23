@@ -1,0 +1,27 @@
+services:
+  # web:
+  #   build: .
+  #   command: python manage.py runserver 0.0.0.0:8000
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - .:/code
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  redis:
+    image: "redis:7-alpine"
+    ports:
+      - "6379:6379"
+      - "16379:16379"
+      - "26379:26379"
+  celery_worker:
+    build: .
+    command: celery -A sentiment worker --pool=solo --loglevel=INFO
+    volumes:
+     - .:/code
+    depends_on:
+      - rabbitmq
+      - redis
