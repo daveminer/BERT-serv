@@ -1,4 +1,7 @@
-broker_url = 'amqp://guest:guest@localhost:5672'
+import os
+
+broker_url = os.environ['CELERY_BROKER']
 include = ['sentiment.tasks']
-result_backend = 'db+postgresql+psycopg2://localhost:5432'
+print(os.environ['RESULT_BACKEND'], 'BACKEND')
+result_backend = os.environ['RESULT_BACKEND']
 result_expires = 3600
