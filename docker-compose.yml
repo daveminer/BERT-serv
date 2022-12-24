@@ -37,7 +37,7 @@ services:
      - .:/code
     environment:
       - CELERY_BROKER=amqp://guest:guest@localhost:5672
-      - RESULT_BACKEND=db+postgresql+psycopg2://localhost:5432//bert_serv
+      - RESULT_BACKEND=db+postgresql+psycopg2://postgres:postgres@localhost:5432//bert_serv
     depends_on:
       - db
       - rabbitmq

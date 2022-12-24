@@ -2,6 +2,7 @@ from .celery import app
 from .models import Sentiment
 from transformers import BertTokenizer, BertForSequenceClassification
 import numpy as np
+import requests
 
 model = 'yiyanghkust/finbert-tone'
 
@@ -22,3 +23,7 @@ def run_sentiment(sentences):
     for idx, sent in enumerate(sentences):
         label = labels[np.argmax(outputs.detach().numpy()[idx])]
         Sentiment.objects.create(text=sent, sentiment=label)
+
+
+def send_webhook(url, data):
+    requests.post(url, data)

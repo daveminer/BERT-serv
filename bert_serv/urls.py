@@ -21,6 +21,7 @@ from sentiment.views.listview import SentimentList
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # path('callback/sentiment/new', SentimentCallback.as_view()),
     path('sentiment/', SentimentList.as_view()),
     path('sentiment/new', SentimentCreate.as_view())
 ]
