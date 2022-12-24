@@ -8,6 +8,8 @@ dev:
 	docker-compose up --detach
 freeze:
 	pip3 freeze > requirements-freeze.txt
+migrate:
+	./manage.py migrate
 services:
 	docker-compose up --detach celery_worker rabbitmq redis
 test:

@@ -6,8 +6,18 @@ services:
   #     - "8000:8000"
   #   volumes:
   #     - .:/code
+  db:
+    image: postgres:14.6-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:3.11.5
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -23,5 +33,9 @@ services:
     volumes:
      - .:/code
     depends_on:
+      - db
       - rabbitmq
       - redis
+volumes:
+  db:
+    driver: local
