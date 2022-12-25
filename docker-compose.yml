@@ -1,6 +1,8 @@
 services:
   # web:
-  #   build: .
+  #   build:
+  #      context: ./
+  #      dockerfile: ./docker/app
   #   command: python manage.py runserver 0.0.0.0:8000
   #   ports:
   #     - "8000:8000"
@@ -13,9 +15,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     # ports:
-    #   - "127.0.0.1:5432:5432"
+    #   - "5432:5432"
     volumes:
       - db:/var/lib/postgresql/data
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
     network_mode: "host"
   rabbitmq:
     image: rabbitmq:3.11.5
@@ -31,13 +34,15 @@ services:
     #   - "26379:26379"
     network_mode: "host"
   celery_worker:
-    build: .
+    build:
+      context: ./
+      dockerfile: ./docker/worker/Dockerfile
     command: celery -A sentiment worker --pool=solo --loglevel=INFO
     volumes:
      - .:/code
     environment:
       - CELERY_BROKER=amqp://guest:guest@localhost:5672
-      - RESULT_BACKEND=db+postgresql+psycopg2://localhost:5432//bert_serv
+      - RESULT_BACKEND=db+postgresql+psycopg2://postgres:postgres@localhost:5432/bert_serv
     depends_on:
       - db
       - rabbitmq
