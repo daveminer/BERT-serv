@@ -13,7 +13,7 @@ class SentimentCreate(View):
 
         try:
             signature("sentiment.tasks.run_sentiment", args=(
-                body), link=callback_task(request, body)).delay()
+                body,), link=callback_task(request)).delay()
 
             return HttpResponse(status=201)
         except:
@@ -27,13 +27,13 @@ def parse_request_body(request):
         raise BadRequest("Could not parse request body as JSON.")
 
 
-def callback_task(request, data):
+def callback_task(request):
     url = request.GET.get('callback_url')
 
     if url:
-        url = validate_url(url)
+        validate_url(url)
 
-        return signature("sentiment.tasks.send_webhook", args=(url, data))
+        return signature("sentiment.tasks.send_webhook", args=(url,), retries=3)
 
     return None
 

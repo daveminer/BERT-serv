@@ -14,14 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import path
 
+from sentiment.views.callbackview import SentimentCallback
 from sentiment.views.createview import SentimentCreate
 from sentiment.views.listview import SentimentList
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('callback/sentiment/new', SentimentCallback.as_view()),
+    path('callback/sentiment/new', SentimentCallback.as_view()),
     path('sentiment/', SentimentList.as_view()),
     path('sentiment/new', SentimentCreate.as_view())
 ]
