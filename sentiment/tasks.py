@@ -1,9 +1,11 @@
-from .celery import app
+from .celery import Celery
 from .models import Sentiment
 from transformers import BertTokenizer, BertForSequenceClassification
 import json
 import numpy as np
 import requests
+
+celery = Celery()
 
 model = 'yiyanghkust/finbert-tone'
 
@@ -15,22 +17,22 @@ tokenizer = BertTokenizer.from_pretrained(model)
 labels = {0: 'neutral', 1: 'positive', 2: 'negative'}
 
 
-@app.task
+@celery.task
 def run_sentiment(sentences):
     inputs = tokenizer(sentences, return_tensors="pt", padding=True)
-
     outputs = finbert(**inputs)[0]
 
     sentiments = []
 
     for idx, sent in enumerate(sentences):
-        label = labels[np.argmax(outputs.detach().numpy()[idx])]
+        results = outputs.detach().numpy()
+        label = labels[np.argmax(results[idx])]
         sentiment = Sentiment.objects.create(text=sent, sentiment=label)
         sentiments.append(sentiment)
 
-    return json.dumps({'id': sentiments[0].id})
+    return json.dumps({'ids': list(map(lambda s: s.id, sentiments))})
 
 
-@app.task
+@celery.task
 def send_webhook(self, url):
     requests.post(url, json=self)

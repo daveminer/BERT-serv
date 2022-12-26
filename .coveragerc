@@ -1,0 +1,15 @@
+[run]
+omit =
+    # test files
+    */test_*.py
+
+    # configuration
+    celeryconfig.py
+
+    # migrations
+    */migrations/*
+
+    # tooling
+    manage.py
+    */asgi.py
+    */wsgi.py

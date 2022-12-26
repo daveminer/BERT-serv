@@ -13,7 +13,7 @@ migrate:
 services:
 	docker-compose up --detach celery_worker db rabbitmq redis
 test:
-	coverage run -m pytest
+	pytest -s .
 test-ci:
 	act
 test-ci-coverage:
