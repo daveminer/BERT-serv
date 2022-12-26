@@ -17,4 +17,4 @@ def test_run_sentiment(mocker):
         ["Stonks go up.", "For great justice."]
     ).apply().get()
 
-    #assert mock_results == json.dumps({'ids': [1, 2]})
+    assert mock_results == json.dumps({'ids': [1, 2]})

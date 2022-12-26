@@ -13,7 +13,6 @@ FROM base as webapp
 CMD ["python", "/code/manage.py", "runserver", "0.0.0.0:8000"]
 
 FROM base as celery_worker
-RUN pip3 install torch
 RUN python3 -c "from transformers import BertTokenizer, BertForSequenceClassification;\
   BertForSequenceClassification.from_pretrained('yiyanghkust/finbert-tone', num_labels=3);"
 CMD [ "celery", "-A", "sentiment", "worker", "--pool=solo", "--loglevel=INFO" ]
