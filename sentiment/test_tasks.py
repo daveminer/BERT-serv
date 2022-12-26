@@ -3,7 +3,7 @@ import numpy
 import pytest
 from .tasks import run_sentiment, send_webhook
 
-@pytest.mark.django_db(True)
+@pytest.mark.django_db
 def test_run_sentiment(mocker):
     mock_finbert = mocker.patch('sentiment.tasks.finbert')
 
