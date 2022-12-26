@@ -1,15 +1,22 @@
-from django.http import HttpResponse
+from django.db.models.query import QuerySet
+from django.forms.models import model_to_dict
+from django.http import HttpResponse, JsonResponse
 from django.views.generic import ListView
+from django.core import serializers
 from ..models import Sentiment
 
 
 class SentimentList(ListView):
     model = Sentiment
 
-    def index(request):
-        last_100 = Sentiment.objects.all().order_by('-created')[:100]
+    queryset: QuerySet[Sentiment] = Sentiment.objects.all().order_by('-created')[:5]
 
-        return HttpResponse(map(Sentiment.__display__, last_100))
+    template_name: str = '../templates/list.html'
 
-    def __display__(record):
-        return f'{record.created} : {record.sentiment} : {record.text}'
+    def get(self, request, *args, **kwargs) -> HttpResponse | JsonResponse:
+        if 'application/json' in request.META.get('HTTP_ACCEPT'):
+            return JsonResponse(list(
+                self.get_queryset().values('created', 'id', 'sentiment', 'text')
+            ), safe=False)
+
+        return super().get(request, *args, **kwargs)
