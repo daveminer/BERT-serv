@@ -1,8 +1,6 @@
 from django.db.models.query import QuerySet
-from django.forms.models import model_to_dict
 from django.http import HttpResponse, JsonResponse
 from django.views.generic import ListView
-from django.core import serializers
 from ..models import Sentiment
 
 
