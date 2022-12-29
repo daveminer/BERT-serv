@@ -1,6 +1,7 @@
 *.pyc
 db.sqlite3
 .coverage
+.env
 .pytest_cache
 .venv
 LOGFILE

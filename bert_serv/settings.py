@@ -9,28 +9,49 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-from dotenv import load_dotenv
+
+import environ
+import os
 from pathlib import Path
 
-# Load from .env
-load_dotenv()
+env = environ.Env(
+    # defaults
+    ALLOWED_HOSTS=(list, []),
+    APPEND_SLASH=(bool, False),
+    DEBUG=(bool, os.getenv('DEBUG', False)),
+    CELERY_USER=(str, os.environ.get('CELERY_USER', 'postgres')),
+    CELERY_PASSWORD=(str, os.environ.get('CELERY_PASSWORD', 'postgres')),
+    CELERY_HOST=(str, os.environ.get('CELERY_HOST', 'localhost')),
+    CELERY_PORT=(int, os.environ.get('CELERY_PORT', 5432)),
+    DB_USER=(str, os.environ.get('DB_USER', 'postgres')),
+    DB_PASSWORD=(str, os.environ.get('DB_PASSWORD', 'postgres')),
+    DB_HOST=(str, os.environ.get('DB_HOST', 'localhost')),
+    DB_PORT=(int, os.environ.get('DB_PORT', 5432)),
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load from .env
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
+DEBUG = env('DEBUG')
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-\
-    !s1i9-xnuq5cqdz$t$ld^m#)2%mefxcs+opd-7f%$(f@2ndpyf'
+SECRET_KEY = env('SECRET_KEY')
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+CELERY_USER = env('CELERY_USER')
+CELERY_PASSWORD = env('CELERY_PASSWORD')
+CELERY_HOST = env('CELERY_HOST')
+CELERY_PORT = env('CELERY_PORT')
 
-ALLOWED_HOSTS = []
-
+DB_USER = env('DB_USER')
+DB_PASSWORD = env('DB_PASSWORD')
+DB_HOST = env('DB_HOST')
+DB_PORT = env('DB_PORT')
 
 # Application definition
 
@@ -48,7 +69,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -82,10 +103,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'bert_serv',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': 5432,
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT'),
     }
 }
 
@@ -136,4 +157,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-APPEND_SLASH = False
+APPEND_SLASH = env('APPEND_SLASH')

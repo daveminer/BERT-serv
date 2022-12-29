@@ -1,49 +1,42 @@
 services:
-  # web:
-  #   build: .
-  #   command: python manage.py runserver 0.0.0.0:8000
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - .:/code
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/code
+    environment:
+      ALLOWED_HOSTS: web,localhost
+      CELERY_HOST: rabbitmq
+      DB_HOST: db
   db:
     image: postgres:14.6-alpine
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    # ports:
-    #   - "5432:5432"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
       - db:/var/lib/postgresql/data
       - ./postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
-    network_mode: "host"
   rabbitmq:
-    image: rabbitmq:3.11.5
-    # ports:
-    #   - "5672:5672"
-    #   - "15672:15672"
-    network_mode: "host"
+    image: rabbitmq:3.11.5-management
+    ports:
+      - "15672:15672"
   redis:
     image: "redis:7-alpine"
-    # ports:
-    #   - "6379:6379"
-    #   - "16379:16379"
-    #   - "26379:26379"
-    network_mode: "host"
   celery_worker:
     build: .
     command: celery -A sentiment worker --pool=solo --loglevel=INFO
     volumes:
      - .:/code
     environment:
-      - CELERY_BROKER=amqp://guest:guest@localhost:5672
-      - RESULT_BACKEND=db+postgresql+psycopg2://postgres:postgres@localhost:5432/bert_serv
+      CELERY_HOST: rabbitmq
+      DB_HOST: db
     depends_on:
       - db
       - rabbitmq
       - redis
-    network_mode: "host"
 volumes:
   db:
     driver: local

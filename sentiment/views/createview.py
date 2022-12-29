@@ -31,17 +31,6 @@ def callback_task(request):
     url = request.GET.get('callback_url')
 
     if url:
-        validate_url(url)
-
         return signature("sentiment.tasks.send_webhook", args=(url,), retries=3)
 
     return None
-
-
-def validate_url(url: str) -> str:
-    validator = URLValidator()
-
-    try:
-        validator(url)
-    except ValidationError as exception:
-        raise BadRequest(f'Invalid callback URL: {exception}')

@@ -7,7 +7,7 @@ from ..models import Sentiment
 class SentimentList(ListView):
     model = Sentiment
 
-    queryset: QuerySet[Sentiment] = Sentiment.objects.all().order_by('-created')[:5]
+    queryset: QuerySet[Sentiment] = Sentiment.objects.all().order_by('-created')[:100]
 
     template_name: str = '../templates/list.html'
 
