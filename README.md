@@ -6,6 +6,8 @@
     | |_|   ||   |___ |   |  | |  |   |          _____| ||   |___ |   |  | | |     |
     |_______||_______||___|  |_|  |___|         |_______||_______||___|  |_|  |___|
 
+[![BERT-serv CI](https://github.com/daveminer/BERT-serv/actions/workflows/ci.yml/badge.svg)](https://github.com/daveminer/BERT-serv/actions/workflows/ci.yml)
+
 **BERT-serv** provides [FinBERT](https://github.com/ProsusAI/finBERT) sentiment as a service. Send financial text via HTTP and get sentiment analysis back from [these pretrained models](https://github.com/yya518/FinBERT).
 
 ## Why
