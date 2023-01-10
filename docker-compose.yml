@@ -10,6 +10,7 @@ services:
       ALLOWED_HOSTS: web,localhost
       CELERY_HOST: rabbitmq
       DB_HOST: db
+      SECRET_KEY: 'django-insecure-!s1i9-xnuq5cqdz$t$ld^m#)2%mefxcs+opd-7f%$(f@2ndpyf'
   db:
     image: postgres:14.6-alpine
     restart: always
@@ -33,7 +34,6 @@ services:
     environment:
       CELERY_HOST: rabbitmq
       DB_HOST: db
-      SECRET_KEY: 'django-insecure-!s1i9-xnuq5cqdz$t$ld^m#)2%mefxcs+opd-7f%$(f@2ndpyf'
     depends_on:
       - db
       - rabbitmq
