@@ -11,6 +11,8 @@
 
 **BERT-serv** provides [FinBERT](https://github.com/ProsusAI/finBERT) sentiment as a service. Send financial text via HTTP and get sentiment analysis back from [these pretrained models](https://github.com/yya518/FinBERT).
 
+:exclamation: Only [this sentiment model](https://huggingface.co/yiyanghkust/finbert-tone) is implemented at this time.
+
 ## Why
 
 - FinBERT analysis made available on-demand to HTTP clients (no Python required!)
