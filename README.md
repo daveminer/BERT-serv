@@ -38,7 +38,7 @@ BERT-serv is now running on local port 8000!
 
 Send a POST request to the `/sentiment/new/` path. A `callback_url` may be specified in
 the query parameters for asynchrous use cases and long-running sentiment analyses. This callback
-will have a JSON object in the body with an arry of the new sentiment record `id`s: `'{"ids": [95, 96]}'`
+will have a JSON object in the body with an array of the new sentiment record `id`s: `'{"ids": [95, 96]}'`
 
 The body of the POST request must be a list; the strings inside will be processed synchronously.
 
