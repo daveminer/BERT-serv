@@ -27,6 +27,7 @@ Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) if nee
 ```
 git clone https://github.com/daveminer/BERT-serv.git
 cd BERT-serv
+cp .env.dist .env
 docker-compose up
 ```
 
