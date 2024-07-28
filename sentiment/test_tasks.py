@@ -13,7 +13,7 @@ def test_run_sentiment(mocker):
     mock_finbert().__getitem__().detach().numpy.return_value = fake_finbert_return
 
     mock_results = run_sentiment.s(
-        ["Stonks go up.", "For great justice."]
+        ["Stonks go up.", "For great justice."], ["test-tag", "another-tag"]
     ).apply().get()
 
     assert mock_results == json.dumps({'ids': [1, 2]})
