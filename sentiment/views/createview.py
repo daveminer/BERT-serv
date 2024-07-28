@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.views.generic import View
 from celery import signature
 import json
+import logging
 
 
 class SentimentCreate(View):
@@ -11,12 +12,19 @@ class SentimentCreate(View):
     def post(self, request, *args, **kwargs):
         body = parse_request_body(request)
 
+        print(body, "BODY")
+        print(request, "REQ")
         try:
-            signature("sentiment.tasks.run_sentiment", args=(
-                body,), link=callback_task(request)).delay()
+            text = body.get('text', [])
+            tags = body.get('tags', [])
 
+            print(text, "TEXT")
+            signature("sentiment.tasks.run_sentiment", args=(
+                text,tags,), link=callback_task(request)).delay()
+            print("SENTIMENT TASK")
             return HttpResponse(status=201)
-        except:
+        except Exception as e:
+            logging.error(f"Error occurred: {e}")
             return HttpResponse(status=500)
 
 

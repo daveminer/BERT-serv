@@ -20,7 +20,7 @@
 - Results are saved and can be queried
 - Analysis requests are handled asynchronously
 
-## How to Run
+## Run the Local Demo
 
 Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) if needed.
 
@@ -76,3 +76,35 @@ curl --request GET \
   --url http://localhost:8000/sentiment/1/ \
   --header 'Accept: application/json'
 ```
+
+## Development Environment Setup
+
+The `make services` command will start all of the services besides the app. This allows for the app to be started and stopped (with `make app`) in the terminal for convenience during development.
+
+### Setting up the environment
+
+Local development requires that the local environment is set up alongside the
+containerized services.
+
+##### Create the virtualenv
+
+```
+python3 -m virtualenv env
+```
+
+##### Load
+
+```
+python3 -m venv .venv
+```
+
+##### Activate
+
+```
+source .venv/bin/activate
+```
+
+Notes:
+
+- `make services` requires [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- `make deps` will install dependencies via pip3 and must be run before `make app`. This can take a few minutes as the PyTorch dependencies are sizable.

@@ -1,6 +1,6 @@
 from .celery import Celery
 from .models import Sentiment
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification, pipeline
 import json
 import numpy as np
 import requests
@@ -14,23 +14,30 @@ finbert = BertForSequenceClassification.from_pretrained(
 
 tokenizer = BertTokenizer.from_pretrained(model)
 
-labels = {0: 'neutral', 1: 'positive', 2: 'negative'}
-
+nlp = pipeline("text-classification", model=finbert, tokenizer=tokenizer)
 
 @celery.task
-def run_sentiment(sentences):
-    inputs = tokenizer(sentences, return_tensors="pt", padding=True)
-    outputs = finbert(**inputs)[0]
+def run_sentiment(sentences, tags):
+    results = nlp(sentences)
 
-    sentiments = []
+    sentiment_objects = []
 
-    for idx, sent in enumerate(sentences):
-        results = outputs.detach().numpy()
-        label = labels[np.argmax(results[idx])]
-        sentiment = Sentiment.objects.create(text=sent, sentiment=label)
-        sentiments.append(sentiment)
+    for idx, result in enumerate(results):
+        label = result['label']
+        score = result['score']
+        sentiment = Sentiment(
+            label=label,
+            text=sentences[idx],
+            score=score,
+            tags=tags
+        )
+        sentiment_objects.append(sentiment)
 
-    return json.dumps({'ids': list(map(lambda s: s.id, sentiments))})
+    # Bulk create all sentiment objects in one query
+    Sentiment.objects.bulk_create(sentiment_objects)
+
+    # Return the IDs of the created sentiments
+    return json.dumps({'ids': [sentiment.id for sentiment in sentiment_objects]})
 
 
 @celery.task

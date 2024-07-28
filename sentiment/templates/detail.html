@@ -1,4 +1,4 @@
 {% block content %}
 <h1>Sentiment {{sentiment.id}}</h1>
-<p>{{ sentiment.created }} / {{ sentiment.sentiment }} / {{sentiment.text}}</p>
+<p>{{ sentiment.created_at }} / {{ sentiment.score }} / {{sentiment.text}}</p>
 {% endblock %}

@@ -1,3 +1,4 @@
+# Development environment
 services:
   web:
     build: .
@@ -16,12 +17,15 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
     volumes:
       - db:/var/lib/postgresql/data
       - ./postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
   rabbitmq:
     image: rabbitmq:3.11.5-management
     ports:
+      - "5672:5672"
       - "15672:15672"
   redis:
     image: "redis:7-alpine"
@@ -29,7 +33,7 @@ services:
     build: .
     command: celery -A sentiment worker --pool=solo --loglevel=INFO
     volumes:
-     - .:/code
+      - .:/code
     environment:
       CELERY_HOST: rabbitmq
       DB_HOST: db
