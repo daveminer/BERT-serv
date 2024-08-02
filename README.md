@@ -77,6 +77,21 @@ curl --request GET \
   --header 'Accept: application/json'
 ```
 
+### Filter sentiments
+
+##### By Tag
+
+A comma-separated list of tags may be specified in the `tags` query parameter.
+
+##### By Age
+
+The `period` query parameter accepts an integer that specifies how many days back to look for sentiments.
+
+### Pagination
+
+The sentiment index controller uses Django's built in [pagination](https://docs.djangoproject.com/en/5.0/topics/pagination/).
+The `/sentiment/` path accepts `page_size` and a `page` query parameters.
+
 ## Development Environment Setup
 
 The `make services` command will start all of the services besides the app. This allows for the app to be started and stopped (with `make app`) in the terminal for convenience during development.
