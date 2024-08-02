@@ -53,7 +53,7 @@ class SentimentList(ListView):
         paginator = Paginator(self.object_list, page_size)
         paginated_queryset = paginator.page(page)
 
-        if 'application/json' in request.META.get('HTTP_ACCEPT'):
+        if 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             object_list = [
                 {
                     'created_at': obj.created_at,
