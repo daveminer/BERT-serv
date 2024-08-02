@@ -12,6 +12,8 @@ urlpatterns = [
     path('sentiment/', include([
         path('', views.SentimentList.as_view()),
         path('<int:pk>/', views.SentimentDetail.as_view()),
-        path('new/', views.SentimentCreate.as_view())
-    ]))
+        path('new/', views.SentimentCreate.as_view()),
+    ])),
+    path('tag/', views.SentimentTagList.as_view())
 ]
+()
