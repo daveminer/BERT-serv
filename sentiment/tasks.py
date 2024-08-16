@@ -37,9 +37,12 @@ def run_sentiment(sentences, tags):
     Sentiment.objects.bulk_create(sentiment_objects)
 
     # Return the IDs of the created sentiments
-    return json.dumps({'ids': [sentiment.id for sentiment in sentiment_objects]})
+    return [sentiment.id for sentiment in sentiment_objects]
 
 
 @celery.task
-def send_webhook(self, url):
-    requests.post(url, json=self)
+def send_webhook(sentiment_ids, url):
+    payload = {
+        "ids": sentiment_ids
+    }
+    requests.post(url, json=payload)

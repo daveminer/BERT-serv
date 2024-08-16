@@ -2,7 +2,7 @@ from django.core.exceptions import BadRequest, ValidationError
 from django.core.validators import URLValidator
 from django.http import HttpResponse
 from django.views.generic import View
-from celery import signature
+from celery import chain, signature
 import json
 import logging
 
@@ -16,8 +16,16 @@ class SentimentCreate(View):
             text = body.get('text', [])
             tags = body.get('tags', [])
 
-            signature("sentiment.tasks.run_sentiment", args=(
-                text,tags,), link=callback_task(request)).delay()
+            callback_url = request.GET.get('callback_url')
+
+            if callback_url:
+                chain(
+                    signature("sentiment.tasks.run_sentiment", args=(text,tags,)),
+                    signature("sentiment.tasks.send_webhook", args=(callback_url,), retries=3)
+                ).delay()
+            else:
+                signature("sentiment.tasks.run_sentiment", args=(
+                    text,tags,)).delay()
 
             return HttpResponse(status=201)
         except Exception as e:
@@ -30,12 +38,3 @@ def parse_request_body(request):
         return json.loads(request.body)
     except ValueError:
         raise BadRequest("Could not parse request body as JSON.")
-
-
-def callback_task(request):
-    url = request.GET.get('callback_url')
-
-    if url:
-        return signature("sentiment.tasks.send_webhook", args=(url,), retries=3)
-
-    return None

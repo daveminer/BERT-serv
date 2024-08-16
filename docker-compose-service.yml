@@ -1,0 +1,30 @@
+# Shared database
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    environment:
+      ALLOWED_HOSTS: localhost
+      CELERY_HOST: localhost
+      DB_HOST: localhost
+    network_mode: host
+  rabbitmq:
+    image: rabbitmq:3.11.5-management
+    network_mode: host
+  redis:
+    image: "redis:7-alpine"
+    network_mode: host
+  celery_worker:
+    build: .
+    command: celery -A sentiment worker --pool=solo --loglevel=INFO
+    volumes:
+      - .:/code
+    environment:
+      CELERY_HOST: localhost
+      DB_HOST: localhost
+    network_mode: host
+    depends_on:
+      - rabbitmq
+      - redis
