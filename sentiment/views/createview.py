@@ -13,14 +13,15 @@ class SentimentCreate(View):
         body = parse_request_body(request)
 
         try:
-            text = body.get('text', [])
+            content = body.get('content', [])
             tags = body.get('tags', [])
 
-            callback_url = request.GET.get('callback_url')
+            content = [(item['id'], item['text']) for item in content]
 
+            callback_url = request.GET.get('callback_url')
             if callback_url:
                 chain(
-                    signature("sentiment.tasks.run_sentiment", args=(text,tags,)),
+                    signature("sentiment.tasks.run_sentiment", args=(content,tags,)),
                     signature("sentiment.tasks.send_webhook", args=(callback_url,), retries=3)
                 ).delay()
             else:

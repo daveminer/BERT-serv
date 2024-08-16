@@ -1,6 +1,7 @@
 from .celery import Celery
 from .models import Sentiment
 from transformers import BertTokenizer, BertForSequenceClassification, pipeline
+from typing import List, Tuple
 import json
 import numpy as np
 import requests
@@ -17,32 +18,37 @@ tokenizer = BertTokenizer.from_pretrained(model)
 nlp = pipeline("text-classification", model=finbert, tokenizer=tokenizer)
 
 @celery.task
-def run_sentiment(sentences, tags):
-    results = nlp(sentences)
+def run_sentiment(content: List[Tuple[int, str]], tags: List[str]):
+    results = nlp([item[1] for item in content])
 
-    sentiment_objects = []
+    sentiments = []
 
     for idx, result in enumerate(results):
         label = result['label']
         score = result['score']
         sentiment = Sentiment(
             label=label,
-            text=sentences[idx],
+            text=content[idx][1],
             score=score,
             tags=tags
         )
-        sentiment_objects.append(sentiment)
+        sentiments.append(sentiment)
 
-    # Bulk create all sentiment objects in one query
-    Sentiment.objects.bulk_create(sentiment_objects)
+    Sentiment.objects.bulk_create(sentiments)
 
-    # Return the IDs of the created sentiments
-    return [sentiment.id for sentiment in sentiment_objects]
+
+    return [
+        {
+            "article_id": content[idx][0],
+            "sentiment": sentiment.to_dict()
+        }
+        for idx, sentiment in enumerate(sentiments)
+    ]
 
 
 @celery.task
-def send_webhook(sentiment_ids, url):
+def send_webhook(sentiments, url):
     payload = {
-        "ids": sentiment_ids
+        "results": sentiments
     }
     requests.post(url, json=payload)
