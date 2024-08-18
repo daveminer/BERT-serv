@@ -11,22 +11,18 @@ class SentimentCreate(View):
 
     def post(self, request, *args, **kwargs):
         body = parse_request_body(request)
+        callback_url = request.GET.get('callback_url')
 
         try:
-            content = body.get('content', [])
-            tags = body.get('tags', [])
+            content = list(map(lambda item: (item['article_id'], item['tags'], item['text']), body))
 
-            content = [(item['id'], item['text']) for item in content]
-
-            callback_url = request.GET.get('callback_url')
             if callback_url:
                 chain(
-                    signature("sentiment.tasks.run_sentiment", args=(content,tags,)),
+                    signature("sentiment.tasks.run_sentiment", args=(content,), retries=3),
                     signature("sentiment.tasks.send_webhook", args=(callback_url,), retries=3)
                 ).delay()
             else:
-                signature("sentiment.tasks.run_sentiment", args=(
-                    text,tags,)).delay()
+                signature("sentiment.tasks.run_sentiment", args=(content,)).delay()
 
             return HttpResponse(status=201)
         except Exception as e:
@@ -39,3 +35,15 @@ def parse_request_body(request):
         return json.loads(request.body)
     except ValueError:
         raise BadRequest("Could not parse request body as JSON.")
+
+
+def process_item(item, callback_url):
+    content = [(item['article_id'], item['text'])]
+
+    if callback_url:
+        chain(
+            signature("sentiment.tasks.run_sentiment", args=(content, tags,)),
+            signature("sentiment.tasks.send_webhook", args=(callback_url,), retries=3)
+        ).delay()
+    else:
+        signature("sentiment.tasks.run_sentiment", args=(content, tags,)).delay()
