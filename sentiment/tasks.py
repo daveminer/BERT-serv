@@ -9,6 +9,8 @@ import requests
 
 celery = Celery()
 
+max_text_length = 512
+
 model = 'yiyanghkust/finbert-tone'
 
 finbert = BertForSequenceClassification.from_pretrained(
@@ -20,7 +22,7 @@ nlp = pipeline("text-classification", model=finbert, tokenizer=tokenizer)
 
 @celery.task
 def run_sentiment(content: List[Tuple[int, List[str], str]]):
-    results = nlp([html.unescape(item[2]) for item in content])
+    results = nlp([html.unescape(item[2])[:max_text_length] for item in content])
 
     sentiments = []
 
