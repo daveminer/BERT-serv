@@ -11,7 +11,7 @@ freeze:
 migrate:
 	./manage.py migrate
 services:
-	docker-compose up --detach celery_worker db rabbitmq redis
+	docker-compose up --detach celery_worker rabbitmq redis
 test:
 	pytest -s .
 test-ci:

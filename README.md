@@ -39,7 +39,7 @@ BERT-serv is now running on local port 8000!
 
 Send a POST request to the `/sentiment/new/` path. A `callback_url` may be specified in
 the query parameters for asynchrous use cases and long-running sentiment analyses. This callback
-will have a JSON object in the body with an array of the new sentiment record `id`s: `'{"ids": [95, 96]}'`
+will have a JSON object in the body with an array of the new sentiment record ids: `{"ids": [95, 96]}`
 
 The body of the POST request must be a list; the strings inside will be processed synchronously.
 
@@ -65,6 +65,31 @@ Make a GET request to the `/sentiment/` path.
 curl --request GET \
   --url http://localhost:8000/sentiment/ \
   --header 'Accept: application/json'
+```
+
+The output will look like this:
+
+```
+[
+	{
+		"created_at": "2024-08-14T04:07:15.127",
+		"label": "Positive",
+		"score": 0.9999837875366211,
+		"tags": [
+			"stock"
+		],
+		"text": "year over year growth is increasing test B"
+	},
+	{
+		"created_at": "2024-08-14T04:07:15.127",
+		"label": "Neutral",
+		"score": 0.9993372559547424,
+		"tags": [
+			"stock"
+		],
+		"text": "test text A"
+	}
+]
 ```
 
 ##### Get a specific sentiment by index
@@ -94,7 +119,8 @@ The `/sentiment/` path accepts `page_size` and a `page` query parameters.
 
 ## Development Environment Setup
 
-The `make services` command will start all of the services besides the app. This allows for the app to be started and stopped (with `make app`) in the terminal for convenience during development.
+The `make services` command will start all of the services besides the app. This allows for the app to be started and stopped (with `make app`) in the terminal for convenience during development. Note that `make services` requires the Postgres database to be running. A database
+can be started with `make db` if one isn't running already.
 
 ### Setting up the environment
 
@@ -123,3 +149,12 @@ Notes:
 
 - `make services` requires [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - `make deps` will install dependencies via pip3 and must be run before `make app`. This can take a few minutes as the PyTorch dependencies are sizable.
+
+## Service setup
+
+The `docker-compose-services.yml` is intended to stand this service and dependencies up against an external Postgres instance.
+
+```
+# To run:
+docker-compose -f docker-compose-service.yml up
+```
