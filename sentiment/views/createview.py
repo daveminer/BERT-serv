@@ -3,6 +3,7 @@ from django.core.validators import URLValidator
 from django.http import HttpResponse
 from django.views.generic import View
 from celery import chain, signature
+from sentiment.tasks import run_sentiment, send_webhook
 import json
 import logging
 
@@ -18,11 +19,11 @@ class SentimentCreate(View):
 
             if callback_url:
                 chain(
-                    signature("sentiment.tasks.run_sentiment", args=(content,), retries=3),
-                    signature("sentiment.tasks.send_webhook", args=(callback_url,), retries=3)
+                    run_sentiment.s(content).set(retries=3),
+                    send_webhook.s(callback_url).set(retries=3),
                 ).delay()
             else:
-                signature("sentiment.tasks.run_sentiment", args=(content,)).delay()
+                run_sentiment.s(content).set(retries=3),
 
             return HttpResponse(status=201)
         except Exception as e:
@@ -35,15 +36,3 @@ def parse_request_body(request):
         return json.loads(request.body)
     except ValueError:
         raise BadRequest("Could not parse request body as JSON.")
-
-
-def process_item(item, callback_url):
-    content = [(item['article_id'], item['text'])]
-
-    if callback_url:
-        chain(
-            signature("sentiment.tasks.run_sentiment", args=(content, tags,)),
-            signature("sentiment.tasks.send_webhook", args=(callback_url,), retries=3)
-        ).delay()
-    else:
-        signature("sentiment.tasks.run_sentiment", args=(content, tags,)).delay()
