@@ -41,16 +41,37 @@ Send a POST request to the `/sentiment/new/` path. A `callback_url` may be speci
 the query parameters for asynchrous use cases and long-running sentiment analyses. This callback
 will have a JSON object in the body with an array of the new sentiment record ids: `{"ids": [95, 96]}`
 
-The body of the POST request must be a list; the strings inside will be processed synchronously.
+The body of the POST request must be a list of objects, each of which containes these fields:
+
+- `article_id`: An identifier for the text; this ends up on the database record as well as in the callback payload.
+- `tags`: The tags to be associated with the sentiment record;
+  useful for filtering on existing sentiment records.
+- `text`: The text to analyze
 
 ```
 curl --request POST \
-  --url 'http://localhost:8000/sentiment/new/?callback_url=http%3A%2F%2Fweb%3A8000%2Fcallback%2Fsentiment%2Fnew%2F' \
+  --url 'http://localhost:8000/sentiment/new?callback_url=http://web:8000/callback/sentiment/new/' \
   --header 'Content-Type: application/json' \
-  --data '[
-	"there is a shortage of capital, and we need extra financing",
-	"year over year growth is increasing"
-]'
+  --data '[{"article_id": 1, "tags": ["stock"], "text": "year over year growth is increasing"}, {"article_id": 2, "tags": ["stock"], "text": "there is a shortage of capital, and we need extra financing"}]'
+```
+
+##### Callback
+
+If a callback is specified, the following payload will be sent to the callback URL:
+
+```
+{
+	"results": [
+		{
+			"article_id": 1,
+			"sentiment": {
+				"label": "Positive",
+				"score": 0.9999837875366211
+				"tags": ["stock"]
+			}
+		}
+	]
+}
 ```
 
 ### Look up sentiment results
@@ -72,22 +93,18 @@ The output will look like this:
 ```
 [
 	{
-		"created_at": "2024-08-14T04:07:15.127",
-		"label": "Positive",
-		"score": 0.9999837875366211,
-		"tags": [
-			"stock"
-		],
-		"text": "year over year growth is increasing test B"
+		"created_at": "2024-08-23T02:19:45.657",
+		"label": "Negative",
+		"score": 0.9966173768043518,
+		"tags": ["stock"],
+		"text": "there is a shortage of capital, and we need extra financing"
 	},
 	{
-		"created_at": "2024-08-14T04:07:15.127",
-		"label": "Neutral",
-		"score": 0.9993372559547424,
-		"tags": [
-			"stock"
-		],
-		"text": "test text A"
+		"created_at": "2024-08-23T02:19:45.657",
+		"label": "Positive",
+		"score": 0.9999837875366211,
+		"tags": ["stock"],
+		"text": "year over year growth is increasing"
 	}
 ]
 ```
