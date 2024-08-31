@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.10 as base
+FROM python:3.10 AS base
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
@@ -9,10 +9,10 @@ COPY requirements.txt /code/
 RUN pip3 install -r requirements.txt
 COPY . /code/
 
-FROM base as webapp
+FROM base AS webapp
 CMD ["python", "/code/manage.py", "runserver", "0.0.0.0:8000"]
 
-FROM base as celery_worker
+FROM base AS celery_worker
 RUN python3 -c "from transformers import BertTokenizer, BertForSequenceClassification;\
   BertForSequenceClassification.from_pretrained('yiyanghkust/finbert-tone', num_labels=3);"
 CMD [ "celery", "-A", "sentiment", "worker", "--pool=solo", "--loglevel=INFO" ]
