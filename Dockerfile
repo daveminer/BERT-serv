@@ -10,7 +10,7 @@ RUN pip3 install -r requirements.txt
 COPY . /code/
 
 FROM base AS webapp
-CMD ["python", "/code/manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "your_project_name.wsgi:application"]
 
 FROM base AS celery_worker
 RUN python3 -c "from transformers import BertTokenizer, BertForSequenceClassification;\
