@@ -141,8 +141,19 @@ can be started with `make db` if one isn't running already.
 
 ### Setting up the environment
 
-Local development requires that the local environment is set up alongside the
-containerized services.
+Local development requires that the local environment is set up alongside the containerized services. 
+
+#### (If needed) Install Python (Ubuntu)
+
+```
+sudo apt install python3
+```
+
+#### (If needed) Install pip3 (Ubuntu)
+
+```
+sudo apt install python3-pip -y
+```
 
 ##### Create the virtualenv
 
