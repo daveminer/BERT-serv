@@ -10,8 +10,11 @@ db_password = os.environ.get('DB_PASSWORD', 'postgres')
 db_host = os.environ.get('DB_HOST', 'localhost')
 db_port = os.environ.get('DB_PORT', 5432)
 
+encoded_celery_password = urllib.parse.quote_plus(celery_password)
+encoded_db_password = urllib.parse.quote_plus(db_password)
+
 # Celery config
-broker_url = f'amqp://{celery_user}:{celery_password}@{celery_host}:{celery_port}'
+broker_url = f'amqp://{celery_user}:{encoded_celery_password}@{celery_host}:{celery_port}'
 include = ['sentiment.tasks']
-result_backend = f'db+postgresql://{db_user}:{db_password}@{db_host}:{db_port}'
+result_backend = f'db+postgresql://{db_user}:{encoded_db_password}@{db_host}:{db_port}'
 result_expires = 3600
