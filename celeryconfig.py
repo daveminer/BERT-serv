@@ -1,4 +1,5 @@
 import os
+import urllib
 
 celery_user = os.getenv('CELERY_USER', 'guest')
 celery_password = os.getenv('CELERY_PASSWORD', 'guest')

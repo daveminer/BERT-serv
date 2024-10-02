@@ -155,9 +155,17 @@ sudo apt install python3
 sudo apt install python3-pip -y
 ```
 
+#### (If needed) Install virtualenv
+
+```
+sudo apt-get update
+sudo apt install python3.12-venv
+```
+
 ##### Create the virtualenv
 
 ```
+
 python3 -m virtualenv env
 ```
 
