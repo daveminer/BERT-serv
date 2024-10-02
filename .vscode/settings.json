@@ -1,5 +1,6 @@
 {
   "yaml.schemas": {
     "https://www.artillery.io/schema.json": []
-  }
+  },
+  "makefile.configureOnOpen": false
 }
