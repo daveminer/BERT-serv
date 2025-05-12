@@ -37,53 +37,45 @@ def get_worker_logger():
     logger = logging.getLogger('bert_serv')
     
     if os.getenv('HONEYCOMB_API_KEY'):
-        try:
-            # Create resource for the worker
-            resource = Resource.create({
-                ResourceAttributes.SERVICE_NAME: "bert-serv-worker",
-                ResourceAttributes.SERVICE_VERSION: "1.0.0"
-            })
-            
-            # Set up logging to Honeycomb
-            log_exporter = OTLPLogExporter(
-                endpoint="api.honeycomb.io:443",
-                headers={
-                    "x-honeycomb-team": os.getenv("HONEYCOMB_API_KEY"),
-                    "x-honeycomb-dataset": "bert-serv-worker"
-                },
-                insecure=False  # Ensure we're using TLS
-            )
-            
-            # Create a local logger provider for the worker
-            logger_provider = LoggerProvider(resource=resource)
-            logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
-            
-            # Configure logger
-            logger.setLevel(logging.INFO)
-            
-            # Remove any existing handlers
-            for handler in logger.handlers[:]:
-                logger.removeHandler(handler)
-            
-            # Add OpenTelemetry handler with local provider
-            otel_handler = LoggingHandler(
-                level=logging.INFO,
-                logger_provider=logger_provider
-            )
-            logger.addHandler(otel_handler)
-            
-            # Add a test log to verify configuration
-            logger.info("Celery worker logging configured", extra={
-                "worker_startup": True,
-                "service_name": "bert-serv-worker"
-            })
-            
-        except Exception as e:
-            logger.error(f"Failed to configure Honeycomb logging: {str(e)}", exc_info=True)
-            # Fall back to basic logging
-            basic_handler = logging.StreamHandler()
-            basic_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-            logger.addHandler(basic_handler)
+        # Create resource for the worker
+        resource = Resource.create({
+            ResourceAttributes.SERVICE_NAME: "bert-serv-worker",
+            ResourceAttributes.SERVICE_VERSION: "1.0.0"
+        })
+        
+        # Set up logging to Honeycomb
+        log_exporter = OTLPLogExporter(
+            endpoint="api.honeycomb.io:443",
+            headers={
+                "x-honeycomb-team": os.getenv("HONEYCOMB_API_KEY"),
+                "x-honeycomb-dataset": "bert-serv-worker"
+            },
+            insecure=False  # Ensure we're using TLS
+        )
+        
+        # Create a local logger provider for the worker
+        logger_provider = LoggerProvider(resource=resource)
+        logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
+        
+        # Configure logger
+        logger.setLevel(logging.INFO)
+        
+        # Remove any existing handlers
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
+        
+        # Add OpenTelemetry handler with local provider
+        otel_handler = LoggingHandler(
+            level=logging.INFO,
+            logger_provider=logger_provider
+        )
+        logger.addHandler(otel_handler)
+        
+        # Add a test log to verify configuration
+        logger.info("Celery worker logging configured", extra={
+            "worker_startup": True,
+            "service_name": "bert-serv-worker"
+        })
     
     return logger
 
