@@ -167,4 +167,4 @@ else:
 
 # Initialize Honeycomb telemetry after all settings are configured
 if os.getenv('HONEYCOMB_API_KEY'):
-    setup_telemetry()
+    setup_telemetry(resource_name="bert-serv")
