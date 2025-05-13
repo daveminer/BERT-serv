@@ -15,14 +15,14 @@ from opentelemetry.sdk._logs import LoggerProvider
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
 
-def setup_telemetry(resource_name, resource_version: str = "1.0.0"):
+def setup_telemetry(resource_name, resource_version: str = "1.0.0", dataset_name: str = "bert-serv"):
     # Set up the tracer provider with service name
     resource = Resource.create({
         ResourceAttributes.SERVICE_NAME: resource_name,
         ResourceAttributes.SERVICE_VERSION: resource_version
     })
     setup_tracing(resource)
-    setup_logging(resource)
+    setup_logging(resource, logging.getLogger(), dataset_name)
     
     # Instrument Django
     DjangoInstrumentor().instrument()
@@ -30,7 +30,7 @@ def setup_telemetry(resource_name, resource_version: str = "1.0.0"):
     # Instrument Celery
     CeleryInstrumentor().instrument()
 
-def setup_logging(resource: Resource):
+def setup_logging(resource: Resource, logger: logging.Logger, dataset_name: str):
     # Verify environment variables
     honeycomb_api_key = os.getenv("HONEYCOMB_API_KEY")
     if not honeycomb_api_key:
@@ -47,28 +47,25 @@ def setup_logging(resource: Resource):
         endpoint="api.honeycomb.io:443",
         headers={
             "x-honeycomb-team": honeycomb_api_key,
-            "x-honeycomb-dataset": service_name
+            "x-honeycomb-dataset": dataset_name
         },
         insecure=False  # Ensure we're using TLS
     )
     
-
     logger_provider = LoggerProvider(resource=resource)
-    set_logger_provider(logger_provider)
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
 
     # Configure root logger
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)
+    logger.setLevel(logging.INFO)
     
     # Remove any existing handlers
-    for handler in root_logger.handlers[:]:
-        root_logger.removeHandler(handler)
+    for handler in logger.handlers[:]:
+        logger.removeHandler(handler)
     
     # Add OpenTelemetry handler
     otel_handler = LoggingHandler(logger_provider=logger_provider)
     otel_handler.setLevel(logging.INFO)
-    root_logger.addHandler(otel_handler)
+    logger.addHandler(otel_handler)
 
     # Add a test log message
     logging.info("OpenTelemetry logging configured successfully", extra={
@@ -82,6 +79,8 @@ def setup_logging(resource: Resource):
         set_logging_format=True,
         logging_format="%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s] - %(message)s"
     )
+
+    return logger
 
 
 

@@ -32,10 +32,6 @@ def run_sentiment(content: List[Tuple[int, List[str], str]]):
     
     try:
         results = nlp([html.unescape(item[2])[:max_text_length] for item in content])
-        logger.debug("NLP processing completed", extra={
-            "results_count": len(results),
-            "task_name": "run_sentiment"
-        })
 
         sentiments = []
 
@@ -49,12 +45,6 @@ def run_sentiment(content: List[Tuple[int, List[str], str]]):
                 tags=content[idx][1]
             )
             sentiments.append(sentiment)
-            logger.debug("Processed item", extra={
-                "item_index": idx,
-                "sentiment_label": label,
-                "sentiment_score": float(score),  # Convert to float for OpenTelemetry
-                "task_name": "run_sentiment"
-            })
 
         results = Sentiment.objects.bulk_create(sentiments)
         logger.info("Successfully saved sentiments", extra={
