@@ -1,11 +1,13 @@
-from .celery import Celery
+from .celery import Celery, worker_logger
 from .models import Sentiment
 from transformers import BertTokenizer, BertForSequenceClassification, pipeline
 from typing import List, Tuple
 import html
-import json
-import numpy as np
 import requests
+import logging
+
+# Use the worker logger
+logger = worker_logger
 
 celery = Celery()
 
@@ -22,35 +24,73 @@ nlp = pipeline("text-classification", model=finbert, tokenizer=tokenizer)
 
 @celery.task
 def run_sentiment(content: List[Tuple[int, List[str], str]]):
-    results = nlp([html.unescape(item[2])[:max_text_length] for item in content])
+    logger.info("Starting sentiment analysis", extra={
+        "content_items": len(content),
+        "task_type": "sentiment_analysis",
+        "task_name": "run_sentiment"
+    })
+    
+    try:
+        results = nlp([html.unescape(item[2])[:max_text_length] for item in content])
 
-    sentiments = []
+        sentiments = []
 
-    for idx, result in enumerate(results):
-        label = result['label']
-        score = result['score']
-        sentiment = Sentiment(
-            label=label,
-            text=content[idx][2],
-            score=score,
-            tags=content[idx][1]
-        )
-        sentiments.append(sentiment)
+        for idx, result in enumerate(results):
+            label = result['label']
+            score = result['score']
+            sentiment = Sentiment(
+                label=label,
+                text=content[idx][2],
+                score=score,
+                tags=content[idx][1]
+            )
+            sentiments.append(sentiment)
 
-    Sentiment.objects.bulk_create(sentiments)
+        results = Sentiment.objects.bulk_create(sentiments)
+        logger.info("Successfully saved sentiments", extra={
+            "saved_count": len(results),
+            "task_name": "run_sentiment"
+        })
 
-    return [
-        {
-            "article_id": content[idx][0],
-            "sentiment": {k: v for k, v in sentiment.to_dict().items() if k in ["label", "score", "tags"]}
-        }
-        for idx, sentiment in enumerate(sentiments)
-    ]
+        return [
+            {
+                "article_id": content[idx][0],
+                "sentiment": {k: v for k, v in sentiment.to_dict().items() if k in ["label", "score", "tags"]}
+            }
+            for idx, sentiment in enumerate(sentiments)
+        ]
+    except Exception as e:
+        logger.error("Error in sentiment analysis", extra={
+            "error_message": str(e),
+            "error_type": type(e).__name__,
+            "task_name": "run_sentiment"
+        }, exc_info=True)
+        raise
 
 
 @celery.task
 def send_webhook(sentiments, url):
-    payload = {
-        "results": sentiments
-    }
-    requests.post(url, json=payload)
+    logger.info("Sending webhook", extra={
+        "webhook_url": url,
+        "results_count": len(sentiments),
+        "task_name": "send_webhook"
+    })
+    
+    try:
+        payload = {
+            "results": sentiments
+        }
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+        logger.info("Webhook sent successfully", extra={
+            "status_code": response.status_code,
+            "task_name": "send_webhook"
+        })
+    except Exception as e:
+        logger.error("Error sending webhook", extra={
+            "error_message": str(e),
+            "error_type": type(e).__name__,
+            "webhook_url": url,
+            "task_name": "send_webhook"
+        }, exc_info=True)
+        raise

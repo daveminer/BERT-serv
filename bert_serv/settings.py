@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import environ
 import os
 from pathlib import Path
+from .telemetry import setup_telemetry
 
 env = environ.Env(
     # defaults
@@ -163,3 +164,7 @@ if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+# Initialize Honeycomb telemetry after all settings are configured
+if os.getenv('HONEYCOMB_API_KEY'):
+    setup_telemetry(resource_name="bert-serv", dataset_name="bert-serv")

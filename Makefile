@@ -9,7 +9,9 @@ coverage-html:
 deps:
 	pip3 install -r requirements.txt
 dev:
-	docker-compose up --detach
+	docker compose up --detach
+dev-services:
+	docker compose up --detach celery_worker rabbitmq redis
 freeze:
 	pip3 freeze > requirements-freeze.txt
 migrate:
@@ -18,8 +20,6 @@ run-app:
 	docker run -d --name bert-serv --network host bert-serv
 run-worker:
 	docker run -d --name bert-serv-worker --network host bert-serv-worker
-services:
-	docker-compose up --detach celery_worker rabbitmq redis
 stop-app:
 	docker stop bert-serv || true
 	docker rm bert-serv || true

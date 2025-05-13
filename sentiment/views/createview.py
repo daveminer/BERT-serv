@@ -23,7 +23,7 @@ class SentimentCreate(View):
                     send_webhook.s(callback_url).set(retries=3),
                 ).delay()
             else:
-                run_sentiment.s(content).set(retries=3),
+                run_sentiment.s(content).set(retries=3).delay()
 
             return HttpResponse(status=201)
         except Exception as e:

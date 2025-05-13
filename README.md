@@ -136,7 +136,7 @@ The `/sentiment/` path accepts `page_size` and a `page` query parameters.
 
 ## Development Environment Setup
 
-The `make services` command will start all of the services besides the app. This allows for the app to be started and stopped (with `make app`) in the terminal for convenience during development. Note that `make services` requires the Postgres database to be running. A database
+The `make dev-services` command will start all of the services besides the app. This allows for the app to be started and stopped (with `make app`) in the terminal for convenience during development. Note that `make dev-services` requires the Postgres database to be running. A database
 can be started with `make db` if one isn't running already.
 
 ### Setting up the environment
