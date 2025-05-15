@@ -44,6 +44,9 @@ DEBUG = env('DEBUG')
 SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
+# Disable automatic URL trailing slash
+APPEND_SLASH = False
+
 CELERY_USER = env('CELERY_USER')
 CELERY_PASSWORD = env('CELERY_PASSWORD')
 CELERY_HOST = env('CELERY_HOST')
@@ -158,7 +161,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-APPEND_SLASH = env('APPEND_SLASH')
+APPEND_SLASH = False
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
