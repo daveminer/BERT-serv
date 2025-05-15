@@ -26,9 +26,6 @@ def setup_telemetry(resource_name, resource_version: str = "1.0.0", dataset_name
     
     # Instrument Django
     DjangoInstrumentor().instrument()
-    
-    # Instrument Celery
-    CeleryInstrumentor().instrument()
 
 def setup_logging(resource: Resource, logger: logging.Logger, dataset_name: str):
     # Verify environment variables
@@ -60,7 +57,7 @@ def setup_logging(resource: Resource, logger: logging.Logger, dataset_name: str)
     
     # Remove any existing handlers
     for handler in logger.handlers[:]:
-        logger.removeHandler(handler)
+      logger.removeHandler(handler)
     
     # Add OpenTelemetry handler
     otel_handler = LoggingHandler(logger_provider=logger_provider)
@@ -72,13 +69,6 @@ def setup_logging(resource: Resource, logger: logging.Logger, dataset_name: str)
         "service.name": service_name,
         "honeycomb_dataset": service_name
     })
-    
-    # Instrument logging after setting up the handler
-
-    LoggingInstrumentor().instrument(
-        set_logging_format=True,
-        logging_format="%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s] - %(message)s"
-    )
 
     return logger
 

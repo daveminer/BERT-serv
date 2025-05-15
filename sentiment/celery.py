@@ -3,6 +3,7 @@ import os
 import logging
 from celery import Celery
 from pathlib import Path
+from opentelemetry.instrumentation.celery import CeleryInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.semconv.resource import ResourceAttributes
 
@@ -16,9 +17,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load from .env
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
-# Configure logging before creating Celery app
-logging.basicConfig(level=logging.INFO)
 
 app = Celery('bert_serv')
 
@@ -44,4 +42,6 @@ def get_worker_logger():
 worker_logger = get_worker_logger()
 
 if __name__ == '__main__':
+    CeleryInstrumentor().instrument()
+
     app.start()
